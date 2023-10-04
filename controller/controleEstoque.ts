@@ -90,14 +90,25 @@ const removerItem = async () => {
             throw new Error('Este item já está desativado no iventário.');
         }
 
-        data = await readCSV(filePath);
-        data.forEach(item => {
-            if (item.nome.toUpperCase() === itemEncontrado.nome.toUpperCase()) {
-                item.ativo = false;
-            }
-        });
-        await writeCSV(data);
-        console.log("Item encontrado e desativado.\n");
+        console.log("Item encontrado: ", itemEncontrado);
+        console.log("Realmente deseja excluí-lo? (S/N)\n");
+        const opcao = await question('Opção: ');
+
+        if (opcao.toUpperCase() == "N") {
+            console.log('Operação cancelada.\n');
+        } else if (opcao.toUpperCase() == "S") {
+            data = await readCSV(filePath);
+            data.forEach(item => {
+                if (item.nome.toUpperCase() === itemEncontrado.nome.toUpperCase()) {
+                    item.ativo = false;
+                }
+            });
+            await writeCSV(data);
+            console.log("Item desativado.\n");
+        } else {
+            throw new Error('Opção inválida.');
+        }
+
     } catch (error) {
         console.error('Ocorreu um erro ao remover o item:', error);
     }
