@@ -54,8 +54,8 @@ const adicionarItem = async () => {
             throw new Error('Preço menor que zero ou não decimal. Tente novamente.');
         }
 
-        if (novoItem.quantidade <= 0 || isFloat(novoItem.quantidade) === true) {
-            throw new Error('Quantidade menor que zero ou decimal. Tente novamente.');
+        if (novoItem.quantidade <= 0) {
+            throw new Error('Quantidade menor que zero. Tente novamente.');
         }
 
         data.push(novoItem);
