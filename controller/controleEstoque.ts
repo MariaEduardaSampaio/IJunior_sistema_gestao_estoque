@@ -114,7 +114,20 @@ const removerItem = async () => {
     }
 
     rl.close();
+};
 
-}
+const listarItens = async () => {
+    const data = await readCSV(filePath);
+    data.forEach(item => {
+        if (item.ativo) {
+            console.log('\n\nitem ', data.indexOf(item) + 1);
+            console.log('nome: ', item.nome);
+            console.log('peso: ', item.peso + ' Kg/unid');
+            console.log('valor: R$', item.valor);
+            console.log('quantidade: ', item.quantidade + ' unid.');
+        }
+    });
+    rl.close();
+};
 
-export { adicionarItem, removerItem };
+export { adicionarItem, removerItem, listarItens };
