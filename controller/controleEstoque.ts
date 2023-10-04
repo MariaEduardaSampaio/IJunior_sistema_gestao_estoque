@@ -3,6 +3,7 @@
  - basicamente todas as histórias de usuário 
  */
 
+import { read } from 'fs';
 import { EstoqueItem, readCSV } from '../model/readCSV';
 import { writeCSV } from '../model/writeCSV';
 import * as readline from 'readline';
@@ -34,7 +35,7 @@ const adicionarItem = async () => {
     const valor = parseFloat(await question('Valor do produto (em R$): '));
     const quantidade = parseInt(await question('Quantidade disponível: '));
 
-    var novoItem: EstoqueItem = { nome, peso, valor, quantidade };
+    var novoItem: EstoqueItem = { nome, peso, valor, quantidade, ativo: true };
     const data = await readCSV(filePath);
 
     try {
@@ -71,4 +72,38 @@ const adicionarItem = async () => {
     rl.close();
 };
 
-export { adicionarItem };
+const removerItem = async () => {
+    console.log('Remover um item do inventário:\n');
+    console.log('Qual o nome do item que deseja remover?\n');
+
+    const nome = await question('Nome do produto: ');
+
+    var data = await readCSV(filePath);
+
+    try {
+        const itemEncontrado = data.find(item => item.nome.toUpperCase() === nome.toUpperCase());
+        if (!itemEncontrado) {
+            throw new Error('Não existe um item com esse nome no inventário.');
+        }
+
+        if (itemEncontrado.ativo.toString() == "false") {
+            throw new Error('Este item já está desativado no iventário.');
+        }
+
+        data = await readCSV(filePath);
+        data.forEach(item => {
+            if (item.nome.toUpperCase() === itemEncontrado.nome.toUpperCase()) {
+                item.ativo = false;
+            }
+        });
+        await writeCSV(data);
+        console.log("Item encontrado e desativado.\n");
+    } catch (error) {
+        console.error('Ocorreu um erro ao remover o item:', error);
+    }
+
+    rl.close();
+
+}
+
+export { adicionarItem, removerItem };
