@@ -21,6 +21,10 @@ const question = (query: string): Promise<string> => {
         });
     });
 };
+function isFloat(value: any): boolean {
+    return typeof value === 'number' && isFinite(value) && Math.floor(value) !== value;
+
+}
 
 const adicionarItem = async () => {
     console.log('Adicionar um item ao inventário:\n');
@@ -30,11 +34,36 @@ const adicionarItem = async () => {
     const valor = parseFloat(await question('Valor do produto (em R$): '));
     const quantidade = parseInt(await question('Quantidade disponível: '));
 
-    const novoItem: EstoqueItem = { nome, peso, valor, quantidade };
+    var novoItem: EstoqueItem = { nome, peso, valor, quantidade };
+    const data = await readCSV(filePath);
 
     try {
-        await writeCSV(novoItem);
+        if (data.find(item => item.nome.toUpperCase() === novoItem.nome.toUpperCase())) {
+            throw new Error('Já existe um item com esse nome no inventário.');
+        }
+
+        if (novoItem.nome === '' || typeof (novoItem.nome) !== 'string') {
+            throw new Error('Nome deve ser preenchido com uma string. Tente novamente.');
+        }
+
+        if (novoItem.peso <= 0.0 || isFloat(novoItem.peso) === false) {
+            throw new Error('Peso menor que zero ou não decimal. Tente novamente.');
+        }
+
+        if (novoItem.valor <= 0.0 || isFloat(novoItem.valor) === false) {
+            throw new Error('Preço menor que zero ou não decimal. Tente novamente.');
+        }
+
+        if (novoItem.quantidade <= 0 || isFloat(novoItem.quantidade) === true) {
+            throw new Error('Quantidade menor que zero ou decimal. Tente novamente.');
+        }
+
+        data.push(novoItem);
+        await writeCSV(data);
+
         console.log('Item adicionado com sucesso ao inventário.');
+        console.log('Dados atualizados do CSV:', data);
+
     } catch (error) {
         console.error('Ocorreu um erro ao adicionar o item:', error);
     }
