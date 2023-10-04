@@ -1,0 +1,9 @@
+*.js
+*.js.map
+/dist/
+/out/
+tsconfig.json
+*.d.ts
+/node_modules/
+/.vscode/
+*.csv
