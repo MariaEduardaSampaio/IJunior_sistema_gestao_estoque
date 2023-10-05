@@ -67,7 +67,6 @@ const removerItemExceptions = async (): Promise<void> => {
 
     const data = await readCSV(filePath);
     const nome = await question('Nome do produto: ');
-    rl.close();
 
     const itemEncontrado = data.find(item => item.nome.toUpperCase() === nome.toUpperCase());
 
@@ -86,6 +85,7 @@ const removerItemExceptions = async (): Promise<void> => {
     console.log("Realmente deseja excluí-lo? (S/N)\n");
 
     const opcao = await question('Opção: ');
+    rl.close();
 
     if (opcao.toUpperCase() == "N") {
         console.log('Operação cancelada.\n');
