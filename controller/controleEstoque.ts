@@ -27,7 +27,7 @@ function isFloat(value: any): boolean {
 
 }
 
-const adicionarItem = async () => {
+const adicionarItem = async (): Promise<void> => {
     console.log('Adicionar um item ao inventário:\n');
 
     const nome = await question('Nome do produto: ');
@@ -72,7 +72,7 @@ const adicionarItem = async () => {
     rl.close();
 };
 
-const removerItem = async () => {
+const removerItem = async (): Promise<void> => {
     console.log('Remover um item do inventário:\n');
     console.log('Qual o nome do item que deseja remover?\n');
 
@@ -116,10 +116,10 @@ const removerItem = async () => {
     rl.close();
 };
 
-const listarItens = async () => {
+const listarItens = async (): Promise<void> => {
     const data = await readCSV(filePath);
     data.forEach(item => {
-        if (item.ativo) {
+        if (item.ativo.toString() === 'true') {
             console.log('\n\nitem ', data.indexOf(item) + 1);
             console.log('nome: ', item.nome);
             console.log('peso: ', item.peso + ' Kg/unid');
@@ -130,11 +130,11 @@ const listarItens = async () => {
     rl.close();
 };
 
-const valorTotal = async () => {
+const valorTotal = async (): Promise<number> => {
     const data = await readCSV(filePath);
 
     const somaTotal = data.reduce((acc, item) => {
-        if (item.ativo) {
+        if (item.ativo.toString() === 'true') {
             acc += item.valor * item.quantidade;
         }
         return acc;
@@ -142,13 +142,15 @@ const valorTotal = async () => {
 
     console.log('Valor total do inventário: R$', somaTotal);
     rl.close();
+
+    return somaTotal;
 };
 
-const pesoTotal = async () => {
+const pesoTotal = async (): Promise<void> => {
     const data = await readCSV(filePath);
 
     const pesoTotal = data.reduce((acc, item) => {
-        if (item.ativo) {
+        if (item.ativo.toString() === 'true') {
             acc += item.peso * item.quantidade;
         }
         return acc;
@@ -158,4 +160,25 @@ const pesoTotal = async () => {
     rl.close();
 };
 
-export { adicionarItem, removerItem, listarItens, valorTotal, pesoTotal };
+const quantidadeTotal = async (): Promise<number> => {
+    const data = await readCSV(filePath);
+    const qntdTotal = data.reduce((acc, item) => {
+        if (item.ativo.toString() === 'true') {
+            acc += parseInt(item.quantidade.toString());
+        }
+        return acc;
+    }, 0);
+    return qntdTotal;
+};
+
+const mediaValor = async (): Promise<number> => {
+    const somaTotal = await valorTotal();
+    const quantidadeItens = await quantidadeTotal();
+    const mediaValor = somaTotal / quantidadeItens;
+    console.log(quantidadeItens)
+
+    console.log('Média de valor dos itens: R$', mediaValor.toFixed(2));
+    return mediaValor;
+};
+
+export { adicionarItem, removerItem, listarItens, valorTotal, pesoTotal, mediaValor };
