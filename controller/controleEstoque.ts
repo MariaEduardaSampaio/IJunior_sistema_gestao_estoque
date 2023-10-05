@@ -162,7 +162,7 @@ const pesoTotal = async (): Promise<number> => {
     return pesoTotal;
 };
 
-const quantidadeTotal = async (): Promise<number> => {
+const quantidadeItens = async (): Promise<number> => {
     const data = await readCSV(filePath);
     const qntdTotal = data.reduce((acc, item) => {
         if (item.ativo.toString() === 'true') {
@@ -171,29 +171,34 @@ const quantidadeTotal = async (): Promise<number> => {
         return acc;
     }, 0);
 
+    console.log('Quantidade total de itens: ' + qntdTotal + ' unid.');
+    rl.close();
+
     return qntdTotal;
 };
 
 const mediaValor = async (): Promise<number> => {
     const somaTotal = await valorTotal();
-    const quantidadeItens = await quantidadeTotal();
-    const mediaValor = somaTotal / quantidadeItens;
+    const quantidadeTotal = await quantidadeItens();
+    const mediaValor = somaTotal / quantidadeTotal;
 
     console.log('Média de valor dos itens: R$', mediaValor.toFixed(2));
+    rl.close();
 
     return mediaValor;
 };
 
 const mediaPeso = async (): Promise<number> => {
     const somaTotal = await pesoTotal();
-    const quantidadeItens = await quantidadeTotal();
-    const mediaPeso = somaTotal / quantidadeItens;
+    const quantidadeTotal = await quantidadeItens();
+    const mediaPeso = somaTotal / quantidadeTotal;
     console.log('Média de peso dos itens: ' + mediaPeso.toFixed(2) + 'kg');
+    rl.close();
 
     return mediaPeso;
 };
 
 export {
     adicionarItem, removerItem, listarItens, valorTotal, pesoTotal,
-    mediaValor, mediaPeso
+    mediaValor, mediaPeso, quantidadeItens
 };
