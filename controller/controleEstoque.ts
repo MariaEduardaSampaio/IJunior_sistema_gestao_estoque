@@ -144,4 +144,18 @@ const valorTotal = async () => {
     rl.close();
 };
 
-export { adicionarItem, removerItem, listarItens, valorTotal };
+const pesoTotal = async () => {
+    const data = await readCSV(filePath);
+
+    const pesoTotal = data.reduce((acc, item) => {
+        if (item.ativo) {
+            acc += item.peso * item.quantidade;
+        }
+        return acc;
+    }, 0);
+
+    console.log('Peso total do inventário: ' + pesoTotal + ' Kg');
+    rl.close();
+};
+
+export { adicionarItem, removerItem, listarItens, valorTotal, pesoTotal };
