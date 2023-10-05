@@ -198,7 +198,23 @@ const mediaPeso = async (): Promise<number> => {
     return mediaPeso;
 };
 
+const quantidadeProdutos = async (): Promise<number> => {
+    const data = await readCSV(filePath);
+
+    const produtos = data.reduce((acc, item) => {
+        if (item.ativo.toString() === 'true') {
+            acc++;
+        }
+        return acc;
+    }, 0);
+
+    console.log("Quantidade total de produtos no inventário: ", produtos);
+    rl.close();
+
+    return produtos;
+};
+
 export {
     adicionarItem, removerItem, listarItens, valorTotal, pesoTotal,
-    mediaValor, mediaPeso, quantidadeItens
+    mediaValor, mediaPeso, quantidadeItens, quantidadeProdutos
 };
