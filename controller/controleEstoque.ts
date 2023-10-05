@@ -43,15 +43,13 @@ function listarItens() {
     }
 }
 
-function valorTotal() {
-
+const valorTotal = async () => {
     try {
-        const somaTotal = valorTotalExceptions();
+        const somaTotal = await valorTotalExceptions();
         console.log('Valor total do inventário: R$', somaTotal);
     } catch (error) {
         console.error('Ocorreu um erro ao calcular o valor total:', error);
     }
-
 }
 
 function pesoTotal() {
