@@ -130,4 +130,18 @@ const listarItens = async () => {
     rl.close();
 };
 
-export { adicionarItem, removerItem, listarItens };
+const valorTotal = async () => {
+    const data = await readCSV(filePath);
+
+    const somaTotal = data.reduce((acc, item) => {
+        if (item.ativo) {
+            acc += item.valor * item.quantidade;
+        }
+        return acc;
+    }, 0);
+
+    console.log('Valor total do inventário: R$', somaTotal);
+    rl.close();
+};
+
+export { adicionarItem, removerItem, listarItens, valorTotal };
