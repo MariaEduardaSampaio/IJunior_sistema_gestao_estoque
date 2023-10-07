@@ -2,111 +2,176 @@
  - responsável pelas funções principais do programa
  - basicamente todas as histórias de usuário 
  */
-
-const filePath = './model/estoque.csv';
+import { read } from 'fs';
 import { EstoqueItem, readCSV } from '../model/readCSV';
 import { writeCSV } from '../model/writeCSV';
-
-import {
-    adicionarItemExceptions, removerItemExceptions, listarItensExceptions,
-    valorTotalExceptions, pesoTotalExceptions, quantidadeItensExceptions,
-    mediaValorExceptions, mediaPesoExceptions, quantidadeProdutosExceptions,
-    rl
-} from '../service/serviceEstoque';
-
-function adicionarItem() {
+import * as readline from 'readline';
+const filePath = './model/estoque.csv';
+const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout,
+});
+const question = (query: string): Promise<string> => {
+    return new Promise((resolve) => {
+        rl.question(query, (answer) => {
+            resolve(answer);
+        });
+    });
+};
+function isFloat(value: any): boolean {
+    return typeof value === 'number' && isFinite(value) && Math.floor(value) !== value;
+}
+const adicionarItem = async (): Promise<void> => {
     console.log('Adicionar um item ao inventário:\n');
-
+    const nome = await question('Nome do produto: ');
+    const peso = parseFloat(await question('Peso do produto (em kg): '));
+    const valor = parseFloat(await question('Valor do produto (em R$): '));
+    const quantidade = parseInt(await question('Quantidade disponível: '));
+    var novoItem: EstoqueItem = { nome, peso, valor, quantidade, ativo: true };
+    const data = await readCSV(filePath);
     try {
-        adicionarItemExceptions();
-        console.log('Item adicionado com sucesso ao inventário.\n');
+        if (data.find(item => item.nome.toUpperCase() === novoItem.nome.toUpperCase())) {
+            throw new Error('Já existe um item com esse nome no inventário.');
+        }
+        if (novoItem.nome === '' || typeof (novoItem.nome) !== 'string') {
+            throw new Error('Nome deve ser preenchido com uma string. Tente novamente.');
+        }
+        if (novoItem.peso <= 0.0 || isFloat(novoItem.peso) === false) {
+            throw new Error('Peso menor que zero ou não decimal. Tente novamente.');
+        }
+        if (novoItem.valor <= 0.0 || isFloat(novoItem.valor) === false) {
+            throw new Error('Preço menor que zero ou não decimal. Tente novamente.');
+        }
+        if (novoItem.quantidade <= 0) {
+            throw new Error('Quantidade menor que zero. Tente novamente.');
+        }
+        data.push(novoItem);
+        await writeCSV(data);
+        console.log('Item adicionado com sucesso ao inventário.');
+        console.log('Dados atualizados do CSV:', data);
     } catch (error) {
         console.error('Ocorreu um erro ao adicionar o item:', error);
     }
-}
-
-function removerItem() {
+    rl.close();
+};
+const removerItem = async (): Promise<void> => {
     console.log('Remover um item do inventário:\n');
-
+    console.log('Qual o nome do item que deseja remover?\n');
+    const nome = await question('Nome do produto: ');
+    var data = await readCSV(filePath);
     try {
-        console.log('Qual o nome do item que deseja remover?\n');
-        removerItemExceptions();
+        const itemEncontrado = data.find(item => item.nome.toUpperCase() === nome.toUpperCase());
+        if (!itemEncontrado) {
+            throw new Error('Não existe um item com esse nome no inventário.');
+        }
+        if (itemEncontrado.ativo.toString() == "false") {
+            throw new Error('Este item já está desativado no iventário.');
+        }
+        console.log("Item encontrado: ", itemEncontrado);
+        console.log("Realmente deseja excluí-lo? (S/N)\n");
+        const opcao = await question('Opção: ');
+        if (opcao.toUpperCase() == "N") {
+            console.log('Operação cancelada.\n');
+        } else if (opcao.toUpperCase() == "S") {
+            data = await readCSV(filePath);
+            data.forEach(item => {
+                if (item.nome.toUpperCase() === itemEncontrado.nome.toUpperCase()) {
+                    item.ativo = false;
+                }
+            });
+            await writeCSV(data);
+            console.log("Item desativado.\n");
+        } else {
+            throw new Error('Opção inválida.');
+        }
     } catch (error) {
         console.error('Ocorreu um erro ao remover o item:', error);
     }
-}
-
-function listarItens() {
-    try {
-        listarItensExceptions();
-    } catch (error) {
-        console.error('Ocorreu um erro ao listar os itens:', error);
-    }
-}
-
-const valorTotal = async () => {
-    try {
-        const somaTotal = await valorTotalExceptions();
-        console.log('Valor total do inventário: R$', somaTotal);
-    } catch (error) {
-        console.error('Ocorreu um erro ao calcular o valor total:', error);
-    }
-}
-
-const pesoTotal = async () => {
-    try {
-        const pesoTotal = await pesoTotalExceptions();
-        console.log('Peso total do inventário: ' + pesoTotal + ' Kg');
-    } catch (error) {
-        console.error('Ocorreu um erro ao calcular o peso total:', error);
-    }
-
+    rl.close();
+};
+const listarItens = async (): Promise<void> => {
+    const data = await readCSV(filePath);
+    data.forEach(item => {
+        if (item.ativo.toString() === 'true') {
+            console.log('\n\nitem ', data.indexOf(item) + 1);
+            console.log('nome: ', item.nome);
+            console.log('peso: ', item.peso + ' Kg/unid');
+            console.log('valor: R$', item.valor);
+            console.log('quantidade: ', item.quantidade + ' unid.');
+        }
+    });
+    rl.close();
+};
+const valorTotal = async (): Promise<number> => {
+    const data = await readCSV(filePath);
+    const somaTotal = data.reduce((acc, item) => {
+        if (item.ativo.toString() === 'true') {
+            acc += item.valor * item.quantidade;
+        }
+        return acc;
+    }, 0);
+    console.log('Valor total do inventário: R$', somaTotal);
+    rl.close();
+    return somaTotal;
+};
+const pesoTotal = async (): Promise<number> => {
+    const data = await readCSV(filePath);
+    const pesoTotal = data.reduce((acc, item) => {
+        if (item.ativo.toString() === 'true') {
+            acc += item.peso * item.quantidade;
+        }
+        return acc;
+    }, 0);
+    console.log('Peso total do inventário: ' + pesoTotal + ' Kg');
+    rl.close();
     return pesoTotal;
-}
-
-const quantidadeItens = async () => {
-    try {
-        const qntdTotal = await quantidadeItensExceptions();
-        console.log('Quantidade total de itens: ' + qntdTotal + ' unid.');
-    } catch (error) {
-        console.error('Ocorreu um erro ao calcular a quantidade total de itens:', error);
-    }
 };
-
+const quantidadeItens = async (): Promise<number> => {
+    const data = await readCSV(filePath);
+    const qntdTotal = data.reduce((acc, item) => {
+        if (item.ativo.toString() === 'true') {
+            acc += parseInt(item.quantidade.toString());
+        }
+        return acc;
+    }, 0);
+    console.log('Quantidade total de itens: ' + qntdTotal + ' unid.');
+    rl.close();
+    return qntdTotal;
+};
 const mediaValor = async (): Promise<number> => {
-    try {
-        const media = await mediaValorExceptions();
-        console.log('Média de valor dos itens: R$', media.toFixed(2));
-        return media;
-    } catch (error) {
-        console.error('Ocorreu um erro ao calcular a média de valor dos itens:', error)
-        return -1;
-    }
+    const somaTotal = await valorTotal();
+    const quantidadeTotal = await quantidadeItens();
+    const mediaValor = somaTotal / quantidadeTotal;
+    console.log('Média de valor dos itens: R$', mediaValor.toFixed(2));
+    rl.close();
+    return mediaValor;
 };
-
 const mediaPeso = async (): Promise<number> => {
-    try {
-        const mediaPeso = await mediaPesoExceptions();
-        console.log('Média de peso dos itens: ' + mediaPeso.toFixed(2) + 'kg');
-        return mediaPeso;
-    } catch (error) {
-        console.error('Ocorreu um erro ao calcular a média de peso dos itens:', error);
-        return -1;
-    }
+    const somaTotal = await pesoTotal();
+    const quantidadeTotal = await quantidadeItens();
+    const mediaPeso = somaTotal / quantidadeTotal;
+    console.log('Média de peso dos itens: ' + mediaPeso.toFixed(2) + 'kg');
+    rl.close();
+    return mediaPeso;
 };
 
 const quantidadeProdutos = async (): Promise<number> => {
-    try {
-        const produtos = await quantidadeProdutosExceptions();
-        console.log("Quantidade total de produtos no inventário: ", produtos);
-        return produtos;
-    } catch (error) {
-        console.error('Ocorreu um erro ao calcular a quantidade total de produtos:', error);
-        return -1;
-    }
+    const data = await readCSV(filePath);
+
+    const produtos = data.reduce((acc, item) => {
+        if (item.ativo.toString() === 'true') {
+            acc++;
+        }
+        return acc;
+    }, 0);
+
+    console.log("Quantidade total de produtos no inventário: ", produtos);
+    rl.close();
+
+    return produtos;
 };
 
 export {
     adicionarItem, removerItem, listarItens, valorTotal, pesoTotal,
-    mediaValor, mediaPeso, quantidadeItens, quantidadeProdutos
+    mediaValor, mediaPeso, quantidadeItens, quantidadeProdutos, rl, question
 };
