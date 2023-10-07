@@ -3,27 +3,28 @@ import { EstoqueItem, readCSV } from './readCSV';
 
 const filePath = './model/estoque.csv';
 
-const writeCSV = async (novoItem: EstoqueItem): Promise<void> => {
-    let dadosExistentes: EstoqueItem[] = [];
+const writeCSV = async (dados: EstoqueItem[]): Promise<void> => {
+    var dadosExistentes: EstoqueItem[] = [];
 
     try {
         dadosExistentes = await readCSV(filePath);
-        dadosExistentes.push(novoItem);
-    } catch (error) { /* caso o arquivo não exista, não há dados existentes */ }
+    } catch (error) {
+        throw new Error("Erro ao ler o arquivo CSV.");
+    }
 
 
     const csvWriter = createCsvWriter({
         path: filePath,
         header: [
-            { id: 'nome', title: 'NOME' },
-            { id: 'peso', title: 'PESO' },
-            { id: 'valor', title: 'VALOR' },
-            { id: 'quantidade', title: 'QUANTIDADE' },
-        ],
-        append: false,
+            { id: 'nome', title: 'nome' },
+            { id: 'peso', title: 'peso' },
+            { id: 'valor', title: 'valor' },
+            { id: 'quantidade', title: 'quantidade' },
+            { id: 'ativo', title: 'ativo' },
+        ]
     });
 
-    return csvWriter.writeRecords(dadosExistentes);
+    return csvWriter.writeRecords(dados);
 };
 
 export { writeCSV };
