@@ -1,5 +1,5 @@
-const csv = require('csv-parser');
-const fs = require('fs');
+import csv from 'csv-parser';
+import fs from 'fs';
 
 const filePath = './model/estoque.csv';
 
@@ -8,6 +8,7 @@ interface EstoqueItem {
     peso: number;
     valor: number;
     quantidade: number;
+    ativo: boolean;
 }
 
 const readCSV = async (filePath: string): Promise<EstoqueItem[]> => {
