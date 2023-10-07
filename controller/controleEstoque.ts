@@ -10,7 +10,8 @@ import { writeCSV } from '../model/writeCSV';
 import {
     adicionarItemExceptions, removerItemExceptions, listarItensExceptions,
     valorTotalExceptions, pesoTotalExceptions, quantidadeItensExceptions,
-    mediaValorExceptions, mediaPesoExceptions, quantidadeProdutosExceptions
+    mediaValorExceptions, mediaPesoExceptions, quantidadeProdutosExceptions,
+    rl
 } from '../service/serviceEstoque';
 
 function adicionarItem() {
@@ -52,9 +53,9 @@ const valorTotal = async () => {
     }
 }
 
-function pesoTotal() {
+const pesoTotal = async () => {
     try {
-        const pesoTotal = pesoTotalExceptions();
+        const pesoTotal = await pesoTotalExceptions();
         console.log('Peso total do inventário: ' + pesoTotal + ' Kg');
     } catch (error) {
         console.error('Ocorreu um erro ao calcular o peso total:', error);
@@ -63,15 +64,14 @@ function pesoTotal() {
     return pesoTotal;
 }
 
-function quantidadeItens() {
-
+const quantidadeItens = async () => {
     try {
-        const qntdTotal = quantidadeItensExceptions();
+        const qntdTotal = await quantidadeItensExceptions();
         console.log('Quantidade total de itens: ' + qntdTotal + ' unid.');
     } catch (error) {
         console.error('Ocorreu um erro ao calcular a quantidade total de itens:', error);
     }
-}
+};
 
 const mediaValor = async (): Promise<number> => {
     try {
@@ -93,17 +93,18 @@ const mediaPeso = async (): Promise<number> => {
         console.error('Ocorreu um erro ao calcular a média de peso dos itens:', error);
         return -1;
     }
-}
+};
 
-function quantidadeProdutos() {
+const quantidadeProdutos = async (): Promise<number> => {
     try {
-        const produtos = quantidadeProdutosExceptions();
+        const produtos = await quantidadeProdutosExceptions();
         console.log("Quantidade total de produtos no inventário: ", produtos);
-
+        return produtos;
     } catch (error) {
         console.error('Ocorreu um erro ao calcular a quantidade total de produtos:', error);
+        return -1;
     }
-}
+};
 
 export {
     adicionarItem, removerItem, listarItens, valorTotal, pesoTotal,

@@ -104,6 +104,7 @@ const removerItemExceptions = async (): Promise<void> => {
 
 const listarItensExceptions = async (): Promise<void> => {
     const data = await readCSV(filePath);
+
     data.forEach(item => {
         if (item.ativo.toString() === 'true') {
             console.log('\n\nitem ', data.indexOf(item) + 1);
@@ -113,13 +114,11 @@ const listarItensExceptions = async (): Promise<void> => {
             console.log('quantidade: ', item.quantidade + ' unid.');
         }
     });
+    const qntdProdutos = await quantidadeProdutosExceptions();
 
-    if (data.length === 0) {
+    if (qntdProdutos == 0) {
         throw new Error('Não há itens cadastrados no inventário.');
     }
-
-    // rl.close();
-
 };
 
 const valorTotalExceptions = async (): Promise<number> => {
@@ -137,11 +136,11 @@ const valorTotalExceptions = async (): Promise<number> => {
     }
 
     return somaTotal;
-    // rl.close();
 };
 
 const pesoTotalExceptions = async (): Promise<number> => {
     const data = await readCSV(filePath);
+    const quantidadeTotal = await quantidadeItensExceptions();
 
     const pesoTotal = data.reduce((acc, item) => {
         if (item.ativo.toString() === 'true') {
@@ -150,10 +149,9 @@ const pesoTotalExceptions = async (): Promise<number> => {
         return acc;
     }, 0);
 
-    if (data.length === 0) {
+    if (quantidadeTotal == 0) {
         throw new Error('Não há itens cadastrados no inventário.');
     }
-    // rl.close()
     return pesoTotal;
 };
 
@@ -166,7 +164,6 @@ const quantidadeItensExceptions = async (): Promise<number> => {
         return acc;
     }, 0);
 
-    // rl.close();
     return qntdTotal;
 };
 
@@ -188,7 +185,6 @@ const mediaPesoExceptions = async (): Promise<number> => {
     if (quantidadeTotal == 0) {
         throw new Error('Não há itens cadastrados no inventário.');
     }
-    // rl.close();
 
     const mediaPeso = somaTotal / quantidadeTotal;
     return mediaPeso;
@@ -204,12 +200,14 @@ const quantidadeProdutosExceptions = async (): Promise<number> => {
         return acc;
     }, 0);
 
-    // rl.close();
     return produtos;
 };
+
+rl.close();
 
 export {
     adicionarItemExceptions, removerItemExceptions, listarItensExceptions,
     valorTotalExceptions, pesoTotalExceptions, quantidadeItensExceptions,
-    mediaValorExceptions, mediaPesoExceptions, quantidadeProdutosExceptions
+    mediaValorExceptions, mediaPesoExceptions, quantidadeProdutosExceptions,
+    rl
 };
