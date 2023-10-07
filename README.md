@@ -1,0 +1,2 @@
+# IJunior_sistema_gestao_estoque
+Atividade da 2a semana do Trainee da Trilha de Back-end da IJunior, que envolve a criação de um sistema de gestão de estoque simples, utilizável pelo terminal e com armazenamento local, para praticar conceitos vistos nesta semana como a criação, leitura, atualização e remoção (CRUD), persistência de dados, busca de dados e organização de código.
