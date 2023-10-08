@@ -16,6 +16,7 @@ const writeCSV = async (dados: EstoqueItem[]): Promise<void> => {
     const csvWriter = createCsvWriter({
         path: filePath,
         header: [
+            { id: 'id', title: 'id' },
             { id: 'nome', title: 'nome' },
             { id: 'peso', title: 'peso' },
             { id: 'valor', title: 'valor' },

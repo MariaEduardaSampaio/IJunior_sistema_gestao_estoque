@@ -20,6 +20,7 @@ const question = (query: string): Promise<string> => {
     });
 };
 
+let proximoId = 0;
 
 function menu() {
     console.log("\n****** Menu de opções ******\n");
@@ -53,14 +54,15 @@ async function main() {
                 const peso = parseFloat(await question('Peso do produto (em kg): '));
                 const valor = parseFloat(await question('Valor do produto (em R$): '));
                 const quantidade = parseInt(await question('Quantidade disponível: '));
-                var novoProduto: EstoqueItem = { nome, peso, valor, quantidade, ativo: true };
+                var novoProduto: EstoqueItem = { id: proximoId, nome, peso, valor, quantidade, ativo: true };
+                proximoId++;
                 await adicionarProduto(novoProduto);
                 break;
 
             case 2:
 
-                console.log('Qual o nome do item que deseja remover?\n');
-                const id = await question('Nome do produto: ');
+                console.log('Qual o ID do item que deseja remover?\n');
+                const id = parseInt(await question('ID do produto: '));
                 await removerProduto(id);
                 break;
 

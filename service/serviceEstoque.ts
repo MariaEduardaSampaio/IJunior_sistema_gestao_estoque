@@ -10,8 +10,9 @@ function isFloat(value: any): boolean {
 class estoqueService {
     async criarProduto(novoProduto: EstoqueItem) {
         const produtos = await readCSV(filePath);
-        if (produtos.find(item => item.nome.toUpperCase() === novoProduto.nome.toUpperCase())) {
-            throw new Error('Já existe um item com esse nome no inventário.');
+        if (produtos.find(item => item.nome.toUpperCase() === novoProduto.nome.toUpperCase()
+            && item.id === novoProduto.id)) {
+            throw new Error('Já existe um item com esse nome e ID no inventário.');
         }
 
         if (novoProduto.nome === '' || typeof (novoProduto.nome) !== 'string') {
@@ -34,13 +35,13 @@ class estoqueService {
         await writeCSV(produtos);
     }
 
-    async removerProduto(id: string) {
+    async removerProduto(id: number) {
         var produtos = await readCSV(filePath);
 
-        const itemEncontrado = produtos.find(item => item.nome.toUpperCase() === id.toUpperCase());
+        const itemEncontrado = produtos.find(item => item.id === id);
 
         if (!itemEncontrado)
-            throw new Error('Não existe um item com esse nome no inventário.');
+            throw new Error('Não existe um item com esse ID no inventário.');
 
         if (itemEncontrado.ativo.toString() == "false")
             throw new Error('Este item já está desativado no iventário.');
@@ -54,7 +55,7 @@ class estoqueService {
             console.log('Operação cancelada.\n');
         else if (opcao.toUpperCase() == "S") {
             produtos.forEach(item => {
-                if (item.nome.toUpperCase() === itemEncontrado.nome.toUpperCase())
+                if (item.id === id)
                     item.ativo = false;
             });
             await writeCSV(produtos);
@@ -67,6 +68,7 @@ class estoqueService {
         produtos.forEach(item => {
             if (item.ativo.toString() === 'true') {
                 console.log('\n\nitem ', produtos.indexOf(item) + 1);
+                console.log('ID: ', item.id);
                 console.log('nome: ', item.nome);
                 console.log('peso: ', item.peso + ' Kg/unid');
                 console.log('valor: R$', item.valor);

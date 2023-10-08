@@ -10,9 +10,9 @@ export async function adicionarProduto(novoProduto: EstoqueItem) {
     }
 }
 
-export async function removerProduto(nome: string) {
+export async function removerProduto(id: number) {
     try {
-        await serviceEstoque.removerProduto(nome);
+        await serviceEstoque.removerProduto(id);
         console.log("\nProduto desativado com sucesso!\n");
     } catch (error) {
         console.error('\nOcorreu um erro ao remover o item:', error);
