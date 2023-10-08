@@ -1,15 +1,8 @@
 import csv from 'csv-parser';
 import fs from 'fs';
+import { EstoqueItem } from '../model/data.interface';
 
 const filePath = './model/estoque.csv';
-
-interface EstoqueItem {
-    nome: string;
-    peso: number;
-    valor: number;
-    quantidade: number;
-    ativo: boolean;
-}
 
 const readCSV = async (filePath: string): Promise<EstoqueItem[]> => {
     return new Promise((resolve, reject) => {
