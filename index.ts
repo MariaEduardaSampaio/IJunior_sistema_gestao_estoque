@@ -6,6 +6,7 @@ import {
 } from './controller/controleEstoque';
 import { EstoqueItem } from './model/data.interface';
 import * as readline from 'readline';
+import { readCSV } from './model/readCSV';
 
 const rl = readline.createInterface({
     input: process.stdin,
@@ -19,8 +20,6 @@ const question = (query: string): Promise<string> => {
         });
     });
 };
-
-let proximoId = 0;
 
 function menu() {
     console.log("\n****** Menu de opções ******\n");
@@ -50,20 +49,22 @@ async function main() {
                 continuar = false;
                 break;
             case 1:
+                const id = parseInt(await question('ID do produto: '));
                 const nome = await question('Nome do produto: ');
                 const peso = parseFloat(await question('Peso do produto (em kg): '));
                 const valor = parseFloat(await question('Valor do produto (em R$): '));
                 const quantidade = parseInt(await question('Quantidade disponível: '));
-                var novoProduto: EstoqueItem = { id: proximoId, nome, peso, valor, quantidade, ativo: true };
-                proximoId++;
+                var novoProduto: EstoqueItem = {
+                    id, nome, peso, valor, quantidade, ativo: true
+                };
                 await adicionarProduto(novoProduto);
                 break;
 
             case 2:
 
                 console.log('Qual o ID do item que deseja remover?\n');
-                const id = parseInt(await question('ID do produto: '));
-                await removerProduto(id);
+                const idProduto = parseInt(await question('ID do produto: '));
+                await removerProduto(idProduto);
                 break;
 
             case 3:
