@@ -1,7 +1,7 @@
 import { readCSV } from "../model/readCSV";
 import { writeCSV } from "../model/writeCSV";
 import { EstoqueItem } from '../model/data.interface';
-import { rl, question } from '../index';
+import { question } from '../index';
 const filePath = './model/estoque.csv';
 
 function isFloat(value: any): boolean {
