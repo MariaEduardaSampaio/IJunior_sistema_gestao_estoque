@@ -1,8 +1,6 @@
-import csv from 'csv-parser';
-import fs from 'fs';
+const csv = require('csv-parser');
+import * as fs from 'fs';
 import { EstoqueItem } from '../model/data.interface';
-
-const filePath = './model/estoque.csv';
 
 const readCSV = async (filePath: string): Promise<EstoqueItem[]> => {
     return new Promise((resolve, reject) => {

@@ -2,14 +2,15 @@
   "dependencies": {
     "csv-parser": "^3.0.0",
     "csv-writer": "^1.6.0",
-    "fs": "^0.0.1-security"
+    "fs": "^0.0.1-security",
+    "typescript": "^5.2.2"
   },
   "name": "sistema_gestao_estoque",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "tsc index.ts"
+    "start": "tsc && node index.js"
   },
   "author": "",
   "license": "ISC",
